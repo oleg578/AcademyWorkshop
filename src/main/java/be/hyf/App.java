@@ -3,6 +3,7 @@ package be.hyf;
 import be.hyf.entity.Student;
 import be.hyf.repository.InFileStudentRepository;
 import be.hyf.repository.StudentRepository;
+import be.hyf.service.StudentService;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -20,24 +21,30 @@ public class App {
         Files.createDirectories(Path.of(STORAGE_PATH));
         StudentRepository repository = new InFileStudentRepository(STORAGE_PATH);
 
+        StudentService service = new StudentService(repository);
+
         for (Student student : readStudents(CSV_PATH)) {
-            repository.save(student);
+            service.save(student);
         }
+        System.out.println("=======   LIST OF LOADED STUDENTS   =======");
+        List<Student> studentsLoaded = service.getAll();
+        studentsLoaded.forEach(App::print);
+
         System.out.println("======== GET by ID 2 ==========");
-        print(repository.getById(2));
+        print(service.getById(2));
 
         System.out.println("======== GET by name Oleh ==========");
-        print(repository.getByName("Oleh"));
+        print(service.getByName("Oleh"));
 
         System.out.println("======== CHANGE city ==========");
-        Student student = repository.getById(3);
+        Student student = service.getById(3);
         print(student);
         student.setCity("Namur");
-        repository.update(student);
-        print(repository.getById(3));
+        service.update(student);
+        print(service.getById(3));
 
         System.out.println("=======   LIST OF STUDENTS   =======");
-        List<Student> students = repository.getAll();
+        List<Student> students = service.getAll();
         students.forEach(App::print);
     }
 
