@@ -113,7 +113,6 @@ public class InFileStudentRepository implements StudentRepository {
         String globPattern = "glob:*" + fileNameSuffix;
         PathMatcher matcher = FileSystems.getDefault().getPathMatcher(globPattern);
         List<Path> targets;
-        //List<Student> students;
         try (Stream<Path> stream = Files.walk(startPath)) {
             targets = stream
                     .filter(Files::isRegularFile)
