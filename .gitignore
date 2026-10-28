@@ -54,3 +54,7 @@ bin/
 # OS
 .DS_Store
 Thumbs.db
+
+### storages
+storage/students/*
+storage/workshops/*
