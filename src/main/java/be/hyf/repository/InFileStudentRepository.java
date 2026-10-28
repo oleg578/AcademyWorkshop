@@ -26,10 +26,12 @@ public class InFileStudentRepository implements StudentRepository {
     }
 
     @Override
-    public void save(@NotNull Student student) throws IOException {
+    public void save(@NotNull Student student) throws IOException, IllegalArgumentException {
         // build file name
         String fn = buildFileName(student);
         String targetPath = path + File.separator + fn;
+        // check file exists
+        if (Files.exists(Path.of(targetPath))) throw new IllegalArgumentException("student exists");
         // serialize to file
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(targetPath))) {
             oos.writeObject(student);

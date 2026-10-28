@@ -78,6 +78,56 @@ class InFileStudentRepositoryTest {
     }
 
     @Test
+    void shouldThrowIllegalArgumentWhenSavingStudentWhoseFileAlreadyExists() throws IOException {
+        repository.save(alice());
+
+        IllegalArgumentException error = assertThrows(IllegalArgumentException.class, () -> repository.save(alice()));
+
+        assertEquals("student exists", error.getMessage());
+    }
+
+    @Test
+    void shouldKeepOriginalDataWhenSavingDuplicateStudent() throws IOException {
+        repository.save(alice());
+
+        assertThrows(IllegalArgumentException.class,
+                () -> repository.save(new Student(1, "Alice", "other@example.com", "Ghent")));
+
+        Student stored = repository.getById(1);
+        assertEquals("alice@example.com", stored.getEmail());
+        assertEquals("Brussels", stored.getCity());
+    }
+
+    @Test
+    void shouldThrowIllegalArgumentWhenFileExistsButWasNotCreatedBySave() throws IOException {
+        Files.writeString(Path.of(STORAGE_PATH, "1_Alice.test"), "pre-existing content");
+
+        assertThrows(IllegalArgumentException.class, () -> repository.save(alice()));
+        assertEquals("pre-existing content", Files.readString(Path.of(STORAGE_PATH, "1_Alice.test")));
+    }
+
+    @Test
+    void shouldSaveBothStudentsWhenSameNameButDifferentId() throws IOException {
+        repository.save(alice());
+
+        repository.save(new Student(2, "Alice", "alice2@example.com", "Ghent"));
+
+        assertTrue(Files.isRegularFile(Path.of(STORAGE_PATH, "2_Alice.test")));
+        assertEquals(2, repository.getAll().size());
+    }
+
+    @Test
+    void shouldSaveAgainWhenPreviousFileDeleted() throws IOException {
+        Student student = alice();
+        repository.save(student);
+        repository.delete(student);
+
+        repository.save(student);
+
+        assertTrue(Files.isRegularFile(Path.of(STORAGE_PATH, "1_Alice.test")));
+    }
+
+    @Test
     void shouldReturnSameStudentWhenSavedAndGotById() throws IOException {
         repository.save(alice());
 
@@ -186,7 +236,7 @@ class InFileStudentRepositoryTest {
         List<Student> students = repository.getAll();
 
         assertEquals(1, students.size());
-        assertEquals("alice@example.com", students.get(0).getEmail());
+        assertEquals("alice@example.com", students.getFirst().getEmail());
     }
 
     @Test
@@ -196,7 +246,7 @@ class InFileStudentRepositoryTest {
         student.setCity("Ghent");
         repository.update(student);
 
-        assertEquals("Ghent", repository.getAll().get(0).getCity());
+        assertEquals("Ghent", repository.getAll().getFirst().getCity());
     }
 
     @Test
