@@ -38,17 +38,6 @@ public class InFileStudentRepository implements StudentRepository {
         }
     }
 
-    private boolean fileExistsById(int id) throws IllegalArgumentException, IOException {
-        PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:" + id + "*.data");
-        List<Path> targets;
-        try (Stream<Path> stream = Files.walk(Path.of(path))) {
-            targets = stream
-                    .filter(matcher::matches)
-                    .toList();
-        }
-        return !targets.isEmpty();
-    }
-
     @Override
     public void update(@NotNull Student student) throws IOException {
         // build file name
@@ -132,6 +121,15 @@ public class InFileStudentRepository implements StudentRepository {
             if (targets.isEmpty()) throw new StudentNotFoundException("students not found");
         }
         return targets.stream().map((path) -> deserialize(path.toString())).collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    private boolean fileExistsById(int id) throws IOException {
+        PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:" + id + "_*" + fileNameSuffix);
+        try (Stream<Path> stream = Files.walk(Path.of(path))) {
+            return stream
+                    .filter(Files::isRegularFile)
+                    .anyMatch(file -> matcher.matches(file.getFileName()));
+        }
     }
 
     Student deserialize(String path) throws StudentNotFoundException {
