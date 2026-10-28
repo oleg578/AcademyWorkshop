@@ -30,12 +30,23 @@ public class InFileStudentRepository implements StudentRepository {
         // build file name
         String fn = buildFileName(student);
         String targetPath = path + File.separator + fn;
-        // check file exists
-        if (Files.exists(Path.of(targetPath))) throw new IllegalArgumentException("student exists");
+
+        if (fileExistsById(student.getId())) throw new IllegalArgumentException("student exists");
         // serialize to file
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(targetPath))) {
             oos.writeObject(student);
         }
+    }
+
+    private boolean fileExistsById(int id) throws IllegalArgumentException, IOException {
+        PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:" + id + "*.data");
+        List<Path> targets;
+        try (Stream<Path> stream = Files.walk(Path.of(path))) {
+            targets = stream
+                    .filter(matcher::matches)
+                    .toList();
+        }
+        return !targets.isEmpty();
     }
 
     @Override
