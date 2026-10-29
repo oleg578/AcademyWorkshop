@@ -1,9 +1,10 @@
 package be.hyf.entity;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class Workshop<T> {
+public abstract class Workshop<T> implements Serializable {
     private final int id;
     private final String title;
     private int capacity;
