@@ -17,7 +17,7 @@ public class InFileStudentRepository implements StudentRepository {
 
     public InFileStudentRepository(String path) {
         this.path = path;
-        fileNameSuffix = ".data";
+        fileNameSuffix = ".ser";
     }
 
     public InFileStudentRepository(String path, String fileSuffix) {

@@ -60,7 +60,7 @@ class InFileStudentRepositoryTest {
     void shouldUseDefaultSuffixWhenCreatedWithoutSuffix() {
         InFileStudentRepository defaultRepository = new InFileStudentRepository(STORAGE_PATH);
 
-        assertEquals("1_Alice.data", defaultRepository.buildFileName(alice()));
+        assertEquals("1_Alice.ser", defaultRepository.buildFileName(alice()));
     }
 
     @Test
