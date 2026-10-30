@@ -3,19 +3,22 @@ package be.hyf.entity;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
-public abstract class Workshop<T> implements Serializable {
+public abstract class Workshop implements Serializable {
     private final int id;
     private final String title;
     private int capacity;
     private String instructions;
-    private List<T> participants;
+    private TreeMap<Integer, Student> participants;
 
-    public Workshop(int id, String title, int capacity, List<T> participants, String instructions) {
+    public Workshop(int id, String title, int capacity, List<Student> participants, String instructions) {
         this.id = id;
         this.title = title;
         this.capacity = capacity;
-        this.participants = new ArrayList<>(participants);
+        this.participants = new TreeMap<>();
+        participants.forEach(p -> this.participants.put(p.getId(), p));
         this.instructions = instructions;
     }
 
@@ -35,12 +38,13 @@ public abstract class Workshop<T> implements Serializable {
         this.capacity = capacity;
     }
 
-    public List<T> getParticipants() {
-        return List.copyOf(participants);
+    public List<Student> getParticipants() {
+        return participants.values().stream().toList();
     }
 
-    public void setParticipants(List<T> participants) {
-        this.participants = new ArrayList<>(participants);
+    public void setParticipants(List<Student> participants) {
+        this.participants = new TreeMap<>();
+        participants.forEach(p -> this.participants.put(p.getId(), p));
     }
 
     public String getInstructions() {
