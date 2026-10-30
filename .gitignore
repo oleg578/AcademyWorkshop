@@ -58,6 +58,7 @@ Thumbs.db
 ### storages
 storage/students/*
 storage/workshops/*
+storage/index/*
 
 # Qodana
 qodana.yaml
