@@ -10,19 +10,17 @@ import java.util.TreeMap;
  * There is a tree map that stores the index of the student workshop.
  * For each student id the list of workshop ids is stored.
  */
-public class FSStudentWorkshopIndex {
+public class FSTreeIndex {
     private final String path;
-    private final String fileNameSuffix;
     private TreeMap<Integer, List<Integer>> index;
 
-    public FSStudentWorkshopIndex(String path) {
-        this.path = path;
-        this.fileNameSuffix = ".idx";
+    public FSTreeIndex(String path, String name) {
+        this.path = path + File.separator + name + ".idx";
         index = new TreeMap<>();
     }
 
-    public void load(String filePath) throws IOException, ClassNotFoundException {
-        try (ObjectInputStream os = new ObjectInputStream(new FileInputStream(filePath))) {
+    public void load() throws IOException, ClassNotFoundException {
+        try (ObjectInputStream os = new ObjectInputStream(new FileInputStream(path))) {
             // we trust the data
             @SuppressWarnings("unchecked")
             TreeMap<Integer, List<Integer>> loaded = (TreeMap<Integer, List<Integer>>) os.readObject();
@@ -30,8 +28,8 @@ public class FSStudentWorkshopIndex {
         }
     }
 
-    public void save(String filePath) throws IOException {
-        try (ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(filePath))) {
+    public void save() throws IOException {
+        try (ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(path))) {
             os.writeObject(index);
         }
     }
@@ -46,16 +44,16 @@ public class FSStudentWorkshopIndex {
 
     public void add(int studentId, int workshopId) throws IOException {
         index.computeIfAbsent(studentId, k -> new ArrayList<>()).add(workshopId);
-        save(this.path);
+        save();
     }
 
     public void remove(int studentId) throws IOException {
         index.remove(studentId);
-        save(this.path);
+        save();
     }
 
     public void removeAll() throws IOException {
         index.clear();
-        save(this.path);
+        save();
     }
 }

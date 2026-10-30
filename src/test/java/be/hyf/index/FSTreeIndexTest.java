@@ -13,23 +13,25 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class FSStudentWorkshopIndexTest {
+class FSTreeIndexTest {
 
     @TempDir
     Path storage;
 
-    private Path indexFile;
-    private FSStudentWorkshopIndex index;
+    private FSTreeIndex index;
 
     @BeforeEach
     void setUp() {
-        indexFile = storage.resolve("students.idx");
-        index = new FSStudentWorkshopIndex(indexFile.toString());
+        index = newIndex();
     }
 
-    private FSStudentWorkshopIndex reload() throws IOException, ClassNotFoundException {
-        FSStudentWorkshopIndex reloaded = new FSStudentWorkshopIndex(indexFile.toString());
-        reloaded.load(indexFile.toString());
+    private FSTreeIndex newIndex() {
+        return new FSTreeIndex(storage.toString(), "students");
+    }
+
+    private FSTreeIndex reload() throws IOException, ClassNotFoundException {
+        FSTreeIndex reloaded = newIndex();
+        reloaded.load();
         return reloaded;
     }
 
@@ -66,7 +68,7 @@ class FSStudentWorkshopIndexTest {
         index.add(1, 10);
         index.add(2, 20);
 
-        FSStudentWorkshopIndex reloaded = reload();
+        FSTreeIndex reloaded = reload();
 
         assertEquals(List.of(10), reloaded.get(1));
         assertEquals(List.of(20), reloaded.get(2));
@@ -80,7 +82,7 @@ class FSStudentWorkshopIndexTest {
         index.remove(1);
 
         assertNull(index.get(1));
-        FSStudentWorkshopIndex reloaded = reload();
+        FSTreeIndex reloaded = reload();
         assertNull(reloaded.get(1));
         assertEquals(List.of(20), reloaded.get(2));
     }
@@ -108,10 +110,10 @@ class FSStudentWorkshopIndexTest {
     @Test
     void shouldReplaceCurrentContentWhenLoading() throws IOException, ClassNotFoundException {
         index.add(1, 10);
-        FSStudentWorkshopIndex other = new FSStudentWorkshopIndex(indexFile.toString());
+        FSTreeIndex other = newIndex();
         other.add(2, 20);
 
-        index.load(indexFile.toString());
+        index.load();
 
         assertNull(index.get(1));
         assertEquals(List.of(20), index.get(2));
@@ -119,15 +121,16 @@ class FSStudentWorkshopIndexTest {
 
     @Test
     void shouldThrowWhenLoadingMissingFile() {
-        String missing = storage.resolve("missing.idx").toString();
+        FSTreeIndex missing = new FSTreeIndex(storage.toString(), "missing");
 
-        assertThrows(IOException.class, () -> index.load(missing));
+        assertThrows(IOException.class, missing::load);
     }
 
     @Test
     void shouldThrowWhenSavingToMissingDirectory() {
-        String unreachable = storage.resolve("no-such-dir").resolve("x.idx").toString();
+        FSTreeIndex unreachable =
+                new FSTreeIndex(storage.resolve("no-such-dir").toString(), "x");
 
-        assertThrows(IOException.class, () -> index.save(unreachable));
+        assertThrows(IOException.class, unreachable::save);
     }
 }
