@@ -14,12 +14,17 @@ import java.util.List;
  * Academy Workshop Manager Application
  */
 public class App {
-    private static final Path CSV_PATH = Path.of("./dumps/students.csv");
-    private static final String STORAGE_PATH = "./storage/students/";
+
 
     public static void main(String[] args) throws IOException {
-        Files.createDirectories(Path.of(STORAGE_PATH));
-        StudentRepository repository = new InFileStudentRepository(STORAGE_PATH);
+        playWithStudents();
+    }
+
+    private static void playWithStudents() throws IOException {
+        final Path CSV_PATH = Path.of("./dumps/students.csv");
+        final String STORAGE_STUDENTS = "./storage/students/";
+        Files.createDirectories(Path.of(STORAGE_STUDENTS));
+        StudentRepository repository = new InFileStudentRepository(STORAGE_STUDENTS);
 
         StudentService service = new StudentService(repository);
 
