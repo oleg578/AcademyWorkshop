@@ -2,7 +2,7 @@ package be.hyf.entity;
 
 import java.util.List;
 
-public class OnlineWorkshop extends Workshop<Student>{
+public class OnlineWorkshop extends Workshop {
 
     public OnlineWorkshop(
             int id,

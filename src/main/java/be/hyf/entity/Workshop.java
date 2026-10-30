@@ -40,6 +40,17 @@ public abstract class Workshop implements Serializable {
         return participants.values().stream().toList();
     }
 
+    public void addParticipant(Student student) {
+        if (participants.size() >= capacity) {
+            throw new IllegalStateException("Workshop is full");
+        }
+        participants.put(student.getId(), student);
+    }
+
+    public boolean deleteParticipant(int id) {
+        return participants.remove(id) != null;
+    }
+
     public void setParticipants(List<Student> participants) {
         this.participants = new TreeMap<>();
         participants.forEach(p -> this.participants.put(p.getId(), p));
