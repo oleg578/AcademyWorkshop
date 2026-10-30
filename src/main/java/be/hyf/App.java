@@ -1,7 +1,7 @@
 package be.hyf;
 
 import be.hyf.entity.Student;
-import be.hyf.index.FSStudentWorkshopIndex;
+import be.hyf.index.FSTreeIndex;
 import be.hyf.repository.InFileStudentRepository;
 import be.hyf.repository.InFileWorkshopRepository;
 import be.hyf.repository.StudentRepository;
@@ -33,11 +33,11 @@ public class App {
 
     private static void playWithIndex() throws IOException, ClassNotFoundException {
         final String STORAGE_INDEX = "./storage/index/";
-        final String INDEX_FILE = STORAGE_INDEX + "student-workshop.idx";
+        final String INDEX_NAME = "student-workshop";
         if (!Files.exists(Path.of(STORAGE_INDEX))) {
             Files.createDirectories(Path.of(STORAGE_INDEX));
         }
-        FSStudentWorkshopIndex index = new FSStudentWorkshopIndex(INDEX_FILE);
+        FSTreeIndex index = new FSTreeIndex(STORAGE_INDEX, INDEX_NAME);
         index.removeAll();
 
         index.add(1, 101);
@@ -48,8 +48,8 @@ public class App {
                 System.out.printf("student %d -> workshops %s%n", studentId, workshopIds));
 
         System.out.println("======== RELOAD from disk ==========");
-        FSStudentWorkshopIndex reloaded = new FSStudentWorkshopIndex(INDEX_FILE);
-        reloaded.load(INDEX_FILE);
+        FSTreeIndex reloaded = new FSTreeIndex(STORAGE_INDEX, INDEX_NAME);
+        reloaded.load();
         System.out.println("student 1 -> " + reloaded.get(1));
 
         System.out.println("======== REMOVE student 1 ==========");
